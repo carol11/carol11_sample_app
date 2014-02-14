@@ -23,7 +23,5 @@ doc/
 .project
 .DS_Store
 .idea
-*secret_token.rb
-*secret
 
 
