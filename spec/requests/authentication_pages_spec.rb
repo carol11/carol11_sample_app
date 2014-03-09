@@ -9,6 +9,7 @@ describe "Authentication" do
 
     it { should have_content('Sign in') }
     it { should have_title('Sign in') }
+
   end
 
   describe "signin" do
@@ -41,6 +42,11 @@ describe "Authentication" do
     describe "followed by signout" do
             before { click_link "Sign out" }
             it { should have_link('Sign in') }
+            it { should_not have_link('Users',       href: users_path) }
+            it { should_not have_link('Profile',     href: user_path(user)) }
+            it { should_not have_link('Settings',    href: edit_user_path(user)) }
+            it { should_not have_link('Sign out',    href: signout_path) }
+
           end
         end
     end
@@ -112,6 +118,21 @@ describe "Authentication" do
         before { delete user_path(user) }
         specify { expect(response).to redirect_to(root_url) }
       end
+    end
+
+    describe "for signed in users" do
+      let(:user) { FactoryGirl.create(:user) }
+      before { sign_in user, no_capybara: true }
+
+      describe "using a 'new' action" do
+          before { get new_user_path }
+          specify { response.should redirect_to(root_path) }
+      end
+
+      describe "using a 'create' action" do
+          before { post users_path(user) }
+          specify { response.should redirect_to(root_path) }
+      end         
     end
   end
 end
