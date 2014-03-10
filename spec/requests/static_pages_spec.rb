@@ -16,14 +16,23 @@ describe "Static pages" do
       before do
         FactoryGirl.create(:micropost, user: user, content: "Lorem ipsum")
         FactoryGirl.create(:micropost, user: user, content: "Dolor sit amet")
+        31.times { FactoryGirl.create(:micropost, user: user) }
         sign_in user
         visit root_path
       end
 
       it "should render the user's feed" do
-        user.feed.each do |item|
-          expect(page).to have_selector("li##{item.id}", text: item.content)
+        user.feed[1..28].each do |item|
+          page.should have_selector("li##{item.id}", text: item.content)
         end
+      end
+
+      it "should have micropost count and pluralize" do
+        page.should have_content('microposts')
+      end
+
+      it "should paginate after 31" do
+        page.should have_selector('div.pagination')
       end
     end
   end

@@ -6,6 +6,7 @@ describe "User pages" do
 
   describe "index" do
     let(:user) { FactoryGirl.create(:user) }
+
     before(:each) do
       sign_in user
       visit users_path
@@ -64,6 +65,7 @@ describe "User pages" do
       it { should have_content(m1.content) }
       it { should have_content(m2.content) }
       it { should have_content(user.microposts.count) }
+      it { should_not have_link('delete') }
     end
   end
 
