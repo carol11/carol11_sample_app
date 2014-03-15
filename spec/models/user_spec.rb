@@ -167,4 +167,38 @@ describe User do
       its(:followed_users) { should_not include(other_user) }
     end
   end
+
+  describe "user relationship associations" do
+    let (:other_user) { FactoryGirl.create(:user) }
+    let (:another_user) { FactoryGirl.create(:user) }
+
+    before do
+      @user.save
+      @user.follow!(other_user)
+      @user.follow!(another_user)
+      other_user.follow!(@user)
+      other_user.follow!(another_user)
+      another_user.follow!(@user)
+      another_user.follow!(other_user)
+    end
+
+    its(:followed_users) { should include(other_user) }
+    its(:followers) { should include(another_user) }
+
+    it "should destroy followers" do
+      followers = @user.followers
+      @user.destroy
+      followers.each do |follower|
+        follower.followed_users.should_not include(@user)
+      end
+    end
+
+    it "should destroy followed" do
+      followed_users = @user.followed_users
+      @user.destroy
+      followed_users.each do |followed_user|
+        followed_user.followers.should_not include(@user)
+      end
+    end
+  end
 end
